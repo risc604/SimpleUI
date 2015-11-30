@@ -6,11 +6,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -19,6 +23,7 @@ public class MainActivity extends AppCompatActivity
     private CheckBox    hideCheckBox;
     private SharedPreferences   sharedPreferences;
     private SharedPreferences.Editor    editor;
+    ListView    historyListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,6 +67,17 @@ public class MainActivity extends AppCompatActivity
             }
         });
         hideCheckBox.setChecked(sharedPreferences.getBoolean("hideCheckBox", false));
+
+        historyListView = (ListView) findViewById(R.id.historyListView);
+        setHistory();
+    }
+
+    private void setHistory()
+    {
+        //String[] data = new String[] {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+        String[] data = Utils.readFile(this, "history.txt").split("\n");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
+        historyListView.setAdapter(adapter);
     }
 
     public void submit(View view)       // button on Click action function.
