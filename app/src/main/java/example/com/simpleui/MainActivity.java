@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -23,7 +24,8 @@ public class MainActivity extends AppCompatActivity
     private CheckBox    hideCheckBox;
     private SharedPreferences   sharedPreferences;
     private SharedPreferences.Editor    editor;
-    ListView    historyListView;
+    private ListView    historyListView;
+    private Spinner     storeInfoSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        storeInfoSpinner = (Spinner) findViewById(R.id.storeInfoSpinner);
         sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
@@ -70,6 +73,15 @@ public class MainActivity extends AppCompatActivity
 
         historyListView = (ListView) findViewById(R.id.historyListView);
         setHistory();
+        setStoreInfo();
+
+    }
+
+    private void setStoreInfo()
+    {
+        String[] stores = getResources().getStringArray(R.array.storeInfo);
+        ArrayAdapter<String> storeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, stores);
+        storeInfoSpinner.setAdapter(storeAdapter);
     }
 
     private void setHistory()
@@ -93,8 +105,9 @@ public class MainActivity extends AppCompatActivity
             inputText.setText("*******************");
         }
         //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-        Toast.makeText(this, Utils.readFile(this, "history.txt"), Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, Utils.readFile(this, "history.txt"), Toast.LENGTH_LONG).show();
         //inputText.setText("");
+        setHistory();  //reload list view.
     }
 
 
