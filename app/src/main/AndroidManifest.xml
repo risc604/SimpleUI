@@ -17,8 +17,10 @@
             </intent-filter>
         </activity>
         
-        <activity android:name=".DrinkMenuActivity">
+        <activity android:name=".DrinkMenuActivity"
+            android:theme="@style/AppTheme">
         </activity>
-    </application>
 
+    </application>
+    
 </manifest>
