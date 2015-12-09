@@ -11,14 +11,20 @@ import java.io.IOException;
  * Created by tomcat on 2015/11/30.
  */
 public class Utils {
-    public static void writeFile(Context context, String fileName, String content) {
-        try {
+    public static void writeFile(Context context, String fileName, String content)
+    {
+        try
+        {
             FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_APPEND);
             fos.write(content.getBytes());
             fos.close();
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e)
+        {
             e.printStackTrace();
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
@@ -41,6 +47,7 @@ public class Utils {
         {
             e.printStackTrace();
         }
+
         return "";
     }
 }
