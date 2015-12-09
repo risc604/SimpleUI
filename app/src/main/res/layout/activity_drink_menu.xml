@@ -11,8 +11,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_gravity="center_horizontal"
-        >
+        android:layout_gravity="center_horizontal">
 
         <TextView
             android:layout_width="0dp"
@@ -35,12 +34,6 @@
             android:id="@+id/button3"
             android:layout_weight="1"/>
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="398dp"
-            android:layout_weight="0.40">
-        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -103,5 +96,26 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="1"/>
     </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="cancel"
+            android:id="@+id/button8"
+            android:layout_weight="1"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="done"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>
