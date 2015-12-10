@@ -1,5 +1,6 @@
 package example.com.simpleui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -20,18 +21,27 @@ public class DrinkMenuActivity extends AppCompatActivity
         setContentView(R.layout.activity_drink_menu);
     }
 
-    public void add(View view)
-    {
-        Button  button = (Button) view;
+    public void add(View view) {
+        Button button = (Button) view;
         int number = Integer.parseInt(button.getText().toString());
         number++;
         button.setText(String.valueOf(number));
     }
 
-    /*  JSON format
-    [   {"name":"black tea", "1":2, "m":10},
-        {"name":"milk tea", "1":10, "m":10},
-        {"name":"green tea", "1":5, "m":10} ]
+    public void done(View view)
+    {
+        JSONArray   jsonData = getData();
+        Intent  data = new Intent();
+        data.putExtra("result", jsonData.toString());
+        setResult(RESULT_OK, data);
+        finish();   //termilate this activity.
+    }
+
+    /*  JSON format save data send to Main activity.
+    [   {"name":"black tea", "l":2, "m":0},
+        {"name":"milk tea", "l":10, "m":3},
+        {"name":"green tea", "l":5, "m":3}
+    ]
      */
     public JSONArray getData()
     {
@@ -39,7 +49,7 @@ public class DrinkMenuActivity extends AppCompatActivity
         int             count = rooLinearLayout.getChildCount();
         JSONArray       array = new JSONArray();
 
-        for (int i=0; i<(count-1); i++)
+        for (int i=0; i<(count-1); i++) //last linearlayout not need.
         {
             LinearLayout ll = (LinearLayout) rooLinearLayout.getChildAt(i);
 

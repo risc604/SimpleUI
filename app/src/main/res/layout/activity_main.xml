@@ -61,6 +61,7 @@
         android:layout_height="wrap_content"
         android:text="menu"
         android:id="@id/button7"
-        android:layout_toLeftOf="@+id/button"
-        android:onClick="goToMenu"/>
+        android:onClick="goToMenu"
+        android:layout_below="@+id/inputText"
+        android:layout_toStartOf="@+id/button"/>
 </RelativeLayout>

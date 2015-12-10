@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,6 +17,7 @@ import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity
 {
+    private final int REQUEST_CODE_MENU_ACTIVITY = 1;
     private EditText    inputText;
     //private Button      btnNext;
     private CheckBox    hideCheckBox;
@@ -113,7 +115,21 @@ public class MainActivity extends AppCompatActivity
         //Intent  intent = new Intent();
         //intent.setClass(this, DrinkMenuActivity.class);
         //startActivity(intent);
-        startActivity(new Intent().setClass(this, DrinkMenuActivity.class));
+        startActivityForResult(new Intent().setClass(this, DrinkMenuActivity.class), REQUEST_CODE_MENU_ACTIVITY);
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(requestCode == REQUEST_CODE_MENU_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                String result = data.getStringExtra("result");
+                Log.d("debug: ", result);
+            }
+            //super.onActivityResult(REQUEST_CODE_MENU_ACTIVITY, RESULT_OK, data);
+        }
+    }
+
 
 }
