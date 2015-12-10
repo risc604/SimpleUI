@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,9 +14,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity
 {
-    private final int REQUEST_CODE_MENU_ACTIVITY = 1;
+    private final static int REQUEST_CODE_MENU_ACTIVITY = 1;
     private EditText    inputText;
     //private Button      btnNext;
     private CheckBox    hideCheckBox;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences.Editor    editor;
     private ListView    historyListView;
     private Spinner     storeInfoSpinner;
+    private String      menuResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -94,10 +98,23 @@ public class MainActivity extends AppCompatActivity
 
     public void submit(View view)       // button on Click action function.
     {
-        String text = inputText.getText().toString();
+        String text = inputText.getText().toString() + "," + menuResult;
         editor.putString("inputText", text);
         editor.commit();    // write to sharePreferce.
-        Utils.writeFile(this, "history.txt", text + "\n");
+
+        try
+        {
+            JSONObject orderData = new JSONObject();
+            JSONArray   array = new JSONArray(menuResult);
+            orderData.put("note", text);
+            orderData.put("menu", array);
+            Utils.writeFile(this, "history.txt", text + "\n");
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+
 
         if(hideCheckBox.isChecked())
         {
@@ -124,8 +141,9 @@ public class MainActivity extends AppCompatActivity
     {
         if(requestCode == REQUEST_CODE_MENU_ACTIVITY) {
             if (resultCode == RESULT_OK) {
-                String result = data.getStringExtra("result");
-                Log.d("debug: ", result);
+                //String result = data.getStringExtra("result");
+                //Log.d("debug: ", result);
+                menuResult = data.getStringExtra("result");
             }
             //super.onActivityResult(REQUEST_CODE_MENU_ACTIVITY, RESULT_OK, data);
         }
