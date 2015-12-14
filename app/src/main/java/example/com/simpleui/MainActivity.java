@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -14,11 +15,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -144,9 +148,8 @@ public class MainActivity extends AppCompatActivity
         String[] from = {"note", "drinkNum", "storeInfo"};
         int[] to = {R.id.note, R.id.drinkNum, R.id.storeInfo};
         SimpleAdapter adapter = new SimpleAdapter(this, data, R.layout.listview_item, from, to);
-
-
         //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data);
+
         historyListView.setAdapter(adapter);
     }
 
@@ -156,26 +159,38 @@ public class MainActivity extends AppCompatActivity
         editor.putString("inputText", text);
         editor.commit();    // write to sharePreferce.
 
-        try {
+        try
+        {
             JSONObject orderData = new JSONObject();
             if (menuResult == null)
                 menuResult = "[]";
             JSONArray array = new JSONArray(menuResult);
-            orderData.put("note", text);
+            orderData.put("note", text);    //make data set.
             orderData.put("menu", array);
             Utils.writeFile(this, "history.txt", orderData.toString() + "\n");
 
             ParseObject testObject = new ParseObject("Order");
             testObject.put("note", text);
             testObject.put("menu", array);
-            testObject.saveInBackground();
-
+            testObject.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    Log.d("debug", "line: 179");
+                    if (e == null) {
+                        Toast.makeText(MainActivity.this, "[SaveCallback] ok.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "[SaveCallback] fail.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });  // the other thread.
+            Log.d("debug", "line: 186");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
 
-        if (hideCheckBox.isChecked()) {
+        if (hideCheckBox.isChecked())
+        {
             text = "*******************";
             inputText.setText("*******************");
         }
