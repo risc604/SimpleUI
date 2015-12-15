@@ -1,0 +1,6 @@
+.gradle/2.8/taskArtifacts/cache.properties.lock
+*.lock
+.gradle/2.8/taskArtifacts/fileHashes.bin
+*.bin
+.idea/workspace.xml
+*.iml
