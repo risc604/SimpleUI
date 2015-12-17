@@ -1,5 +1,6 @@
 package example.com.simpleui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,18 +13,21 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
@@ -51,8 +55,14 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences.Editor editor;
     private ListView historyListView;
     private Spinner storeInfoSpinner;
+    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
+
     private String menuResult;
     private ImageView photoImageView;
+    private boolean hasPhoto = false;
+    private List<ParseObject> queryResult;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -106,11 +116,28 @@ public class MainActivity extends AppCompatActivity
         hideCheckBox.setChecked(sharedPreferences.getBoolean("hideCheckBox", false));
 
         historyListView = (ListView) findViewById(R.id.historyListView);
+        historyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                goToOrderDetail(position);
+            }
+        });
+        progressDialog = new ProgressDialog(this);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         setHistory();
         setStoreInfo();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    private void goToOrderDetail(int position)
+    {
+        Intent intent = new Intent();
+        intent.setClass(this, OrderDetailActivity.class);
+        ParseObject object = queryResult.get(position);
+        intent.putExtra("note", object.getString("note"))
+        startActivity(intent);
     }
 
     private void setStoreInfo()
@@ -145,6 +172,7 @@ public class MainActivity extends AppCompatActivity
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
+                queryResult = objects;
                 List<Map<String, String>> data = new ArrayList<>();
 
                 for (int i = 0; i < objects.size(); i++) {
@@ -164,6 +192,8 @@ public class MainActivity extends AppCompatActivity
                 int[] to = {R.id.note, R.id.drinkNum, R.id.storeInfo};
                 SimpleAdapter adapter = new SimpleAdapter(MainActivity.this, data, R.layout.listview_item, from, to);
                 historyListView.setAdapter(adapter);
+                historyListView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -177,6 +207,9 @@ public class MainActivity extends AppCompatActivity
 
     public void submit(View view)       // button on Click action function.
     {
+        progressDialog.setTitle("Loading ...");
+        progressDialog.show();
+
         String text = inputText.getText().toString() ;
         editor.putString("inputText", text);
         editor.commit();    // write to sharePreferce.
@@ -191,12 +224,22 @@ public class MainActivity extends AppCompatActivity
             orderData.put("menu", array);
             Utils.writeFile(this, "history.txt", orderData.toString() + "\n");
 
-            ParseObject testObject = new ParseObject("Order");
-            testObject.put("note", text);
-            testObject.put("menu", array);
-            testObject.saveInBackground(new SaveCallback() {
+            ParseObject orderObject = new ParseObject("Order");
+            orderObject.put("note", text);
+            orderObject.put("menu", array);
+            if(hasPhoto == true)
+            {
+                Uri uri = Utils.getPhotoUri();
+                ParseFile parseFile = new ParseFile("photo.png", Utils.uriToByte(this, uri));
+                orderObject.put("photo", parseFile);
+            }
+
+            orderObject.saveInBackground(new SaveCallback()
+            {
                 @Override
-                public void done(ParseException e) {
+                public void done(ParseException e)
+                {
+                   progressDialog.dismiss();
                     Log.d("debug", "line: 179");
                     if (e == null) {
                         Toast.makeText(MainActivity.this, "[SaveCallback] ok.", Toast.LENGTH_SHORT).show();
@@ -252,6 +295,7 @@ public class MainActivity extends AppCompatActivity
 
                 Uri uri = Utils.getPhotoUri();
                 photoImageView.setImageURI(uri);
+                hasPhoto = true;
             }
         }
     }
@@ -277,7 +321,7 @@ public class MainActivity extends AppCompatActivity
     {
         Intent  intent = new Intent();
         intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,Utils.getPhotoUri());
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Utils.getPhotoUri());  // call Utils.java
         startActivityForResult(intent, REQUEST_TAKE_PHOTO);
     }
 }
