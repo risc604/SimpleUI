@@ -3,7 +3,9 @@ package example.com.simpleui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -14,13 +16,12 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -41,6 +42,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity
 {
     private final static int REQUEST_CODE_MENU_ACTIVITY = 1;
+    private final static int REQUEST_TAKE_PHOTO = 2;
+
     private EditText inputText;
     //private Button      btnNext;
     private CheckBox hideCheckBox;
@@ -49,11 +52,12 @@ public class MainActivity extends AppCompatActivity
     private ListView historyListView;
     private Spinner storeInfoSpinner;
     private String menuResult;
+    private ImageView photoImageView;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-    private GoogleApiClient client;
+   // private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         //btnNext = (Button)findViewById(R.id.button);
        // hideCheckBox = (CheckBox) findViewById(R.id.hideCheckBox);
         //hideCheckBox.setChecked(true);
+        photoImageView = (ImageView)findViewById(R.id.photo);
 
         //inputText.setText("1234");
         inputText.setText(sharedPreferences.getString("inputText", ""));
@@ -105,7 +110,7 @@ public class MainActivity extends AppCompatActivity
         setStoreInfo();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void setStoreInfo()
@@ -139,22 +144,20 @@ public class MainActivity extends AppCompatActivity
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Order");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e)
-            {
+            public void done(List<ParseObject> objects, ParseException e) {
                 List<Map<String, String>> data = new ArrayList<>();
 
-                for (int i=0; i<objects.size(); i++)
-                {
-                        ParseObject object = objects.get(i); //JSON ojgect package.
-                        String note = object.getString("note");
-                        JSONArray array = object.getJSONArray("menu");
+                for (int i = 0; i < objects.size(); i++) {
+                    ParseObject object = objects.get(i); //JSON ojgect package.
+                    String note = object.getString("note");
+                    JSONArray array = object.getJSONArray("menu");
 
-                        Map<String, String> item = new HashMap<>();
-                        item.put("note", note);
-                        item.put("drinkNum", "15");
-                        item.put("storeInfo", "NTU Store");
+                    Map<String, String> item = new HashMap<>();
+                    item.put("note", note);
+                    item.put("drinkNum", "15");
+                    item.put("storeInfo", "NTU Store");
 
-                        data.add(item);
+                    data.add(item);
                 }
 
                 String[] from = {"note", "drinkNum", "storeInfo"};
@@ -240,6 +243,14 @@ public class MainActivity extends AppCompatActivity
             }
             //super.onActivityResult(REQUEST_CODE_MENU_ACTIVITY, RESULT_OK, data);
         }
+        else if (requestCode == REQUEST_TAKE_PHOTO)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                Bitmap bm = data.getParcelableExtra("data"); //raw picture data.
+                photoImageView.setImageBitmap(bm);
+            }
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu)
@@ -253,7 +264,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         if(id == R.id.action_take_photo)
         {
-            Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show();
+            Intent  intent = new Intent();
+            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(intent, REQUEST_TAKE_PHOTO);
         }
         return super.onOptionsItemSelected(item);
     }

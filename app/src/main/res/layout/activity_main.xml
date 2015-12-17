@@ -13,7 +13,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
         android:id="@+id/textView"/>
 
     <EditText
@@ -64,4 +63,13 @@
         android:onClick="goToMenu"
         android:layout_below="@+id/inputText"
         android:layout_toStartOf="@+id/button"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/photo"
+        android:layout_below="@+id/hideCheckBox"
+        android:layout_alignStart="@id/button7"
+        android:layout_marginStart="27dp"
+        android:layout_above="@+id/historyListView"/>
 </RelativeLayout>
