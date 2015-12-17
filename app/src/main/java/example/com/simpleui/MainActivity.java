@@ -3,7 +3,7 @@ package example.com.simpleui;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -247,8 +247,11 @@ public class MainActivity extends AppCompatActivity
         {
             if (resultCode == RESULT_OK)
             {
-                Bitmap bm = data.getParcelableExtra("data"); //raw picture data.
-                photoImageView.setImageBitmap(bm);
+                //Bitmap bm = data.getParcelableExtra("data"); //raw picture data.
+                //photoImageView.setImageBitmap(bm);
+
+                Uri uri = Utils.getPhotoUri();
+                photoImageView.setImageURI(uri);
             }
         }
     }
@@ -265,10 +268,16 @@ public class MainActivity extends AppCompatActivity
         if(id == R.id.action_take_photo)
         {
             //Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show();
-            Intent  intent = new Intent();
-            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+            goToCamera();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void goToCamera()
+    {
+        Intent  intent = new Intent();
+        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,Utils.getPhotoUri());
+        startActivityForResult(intent, REQUEST_TAKE_PHOTO);
     }
 }

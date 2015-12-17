@@ -4,3 +4,8 @@
 *.bin
 .idea/workspace.xml
 *.iml
+*.lock
+.gradle/2.8/taskArtifacts/fileHashes.bin
+*.bin
+.gradle/2.8/taskArtifacts/taskArtifacts.bin
+.idea/workspace.xml
