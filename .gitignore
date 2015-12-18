@@ -9,3 +9,8 @@
 *.bin
 .gradle/2.8/taskArtifacts/taskArtifacts.bin
 .idea/workspace.xml
+/.gradle/2.8/taskArtifacts/*.bin
+/.gradle/2.8/taskArtifacts/outputFileStates.bin
+/.idea
+/build
+/.gradle
