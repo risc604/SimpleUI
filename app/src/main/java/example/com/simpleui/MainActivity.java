@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,9 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 
-
-public class MainActivity extends AppCompatActivity
-{
+public class MainActivity extends AppCompatActivity {
     private final static int REQUEST_CODE_MENU_ACTIVITY = 1;
     private final static int REQUEST_TAKE_PHOTO = 2;
 
@@ -67,8 +64,7 @@ public class MainActivity extends AppCompatActivity
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
-   // private GoogleApiClient client;
-
+    // private GoogleApiClient client;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,9 +82,9 @@ public class MainActivity extends AppCompatActivity
 
         inputText = (EditText) findViewById(R.id.inputText);
         //btnNext = (Button)findViewById(R.id.button);
-       // hideCheckBox = (CheckBox) findViewById(R.id.hideCheckBox);
+        // hideCheckBox = (CheckBox) findViewById(R.id.hideCheckBox);
         //hideCheckBox.setChecked(true);
-        photoImageView = (ImageView)findViewById(R.id.photo);
+        photoImageView = (ImageView) findViewById(R.id.photo);
 
         //inputText.setText("1234");
         inputText.setText(sharedPreferences.getString("inputText", ""));
@@ -131,29 +127,26 @@ public class MainActivity extends AppCompatActivity
         //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    private void goToOrderDetail(int position)
-    {
+    private void goToOrderDetail(int position) {
         Intent intent = new Intent();
         intent.setClass(this, OrderDetailActivity.class);
         ParseObject object = queryResult.get(position);
-        intent.putExtra("note", object.getString("note"))
+        intent.putExtra("note", object.getString("note"));
         startActivity(intent);
     }
 
-    private void setStoreInfo()
-    {
-        ParseQuery<ParseObject>  query = new ParseQuery<ParseObject>("StoreInfo");
+    private void setStoreInfo() {
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("StoreInfo");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
-            //make objects to array.
-                String[]    stores = new String[objects.size()];
-                for (int i=0; i<stores.length; i++)
-                {
+                //make objects to array.
+                String[] stores = new String[objects.size()];
+                for (int i = 0; i < stores.length; i++) {
                     ParseObject object = objects.get(i);
                     stores[i] = "[" + object.getString("name") + "], " + object.getString("address");
                 }
-                ArrayAdapter<String>    storeAdapter = new
+                ArrayAdapter<String> storeAdapter = new
                         ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, stores);
                 storeInfoSpinner.setAdapter(storeAdapter);
             }
@@ -210,7 +203,7 @@ public class MainActivity extends AppCompatActivity
         progressDialog.setTitle("Loading ...");
         progressDialog.show();
 
-        String text = inputText.getText().toString() ;
+        String text = inputText.getText().toString();
         editor.putString("inputText", text);
         editor.commit();    // write to sharePreferce.
 
@@ -227,35 +220,38 @@ public class MainActivity extends AppCompatActivity
             ParseObject orderObject = new ParseObject("Order");
             orderObject.put("note", text);
             orderObject.put("menu", array);
-            if(hasPhoto == true)
+            if (hasPhoto == true)
             {
                 Uri uri = Utils.getPhotoUri();
                 ParseFile parseFile = new ParseFile("photo.png", Utils.uriToByte(this, uri));
                 orderObject.put("photo", parseFile);
             }
 
-            orderObject.saveInBackground(new SaveCallback()
-            {
+            orderObject.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e)
                 {
-                   progressDialog.dismiss();
-                    Log.d("debug", "line: 179");
-                    if (e == null) {
+                    progressDialog.dismiss();
+                    //Log.d("debug", "line: 179");
+                    if (e == null)
+                    {
                         Toast.makeText(MainActivity.this, "[SaveCallback] ok.", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else
+                    {
                         Toast.makeText(MainActivity.this, "[SaveCallback] fail.", Toast.LENGTH_SHORT).show();
                     }
                 }
             });  // the other thread.
-            Log.d("debug", "line: 186");
-        } catch (JSONException e) {
+            //Log.d("debug", "line: 186");
+        }
+        catch (JSONException e)
+        {
             e.printStackTrace();
         }
 
 
-        if (hideCheckBox.isChecked())
-        {
+        if (hideCheckBox.isChecked()) {
             text = "*******************";
             inputText.setText("*******************");
         }
@@ -265,8 +261,7 @@ public class MainActivity extends AppCompatActivity
         setHistory();  //reload list view.
     }
 
-    public void goToMenu(View view)
-    {
+    public void goToMenu(View view) {
         //Intent  intent = new Intent();
         //intent.setClass(this, DrinkMenuActivity.class);
         //startActivity(intent);
@@ -274,22 +269,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == REQUEST_CODE_MENU_ACTIVITY)
-        {
-            if (resultCode == RESULT_OK)
-            {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_MENU_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
                 //String result = data.getStringExtra("result");
                 //Log.d("debug: ", result);
                 menuResult = data.getStringExtra("result");
             }
             //super.onActivityResult(REQUEST_CODE_MENU_ACTIVITY, RESULT_OK, data);
-        }
-        else if (requestCode == REQUEST_TAKE_PHOTO)
-        {
-            if (resultCode == RESULT_OK)
-            {
+        } else if (requestCode == REQUEST_TAKE_PHOTO) {
+            if (resultCode == RESULT_OK) {
                 //Bitmap bm = data.getParcelableExtra("data"); //raw picture data.
                 //photoImageView.setImageBitmap(bm);
 
@@ -300,26 +289,22 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.action_take_photo)
-        {
+        if (id == R.id.action_take_photo) {
             //Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show();
             goToCamera();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void goToCamera()
-    {
-        Intent  intent = new Intent();
+    private void goToCamera() {
+        Intent intent = new Intent();
         intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Utils.getPhotoUri());  // call Utils.java
         startActivityForResult(intent, REQUEST_TAKE_PHOTO);
