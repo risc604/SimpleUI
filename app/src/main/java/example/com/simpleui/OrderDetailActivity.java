@@ -4,21 +4,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
-import java.util.Objects;
+import android.widget.TextView;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
-    private String address;
+    private TextView addressTextView;
+    //private String address;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_detail);
 
+        addressTextView = (TextView) findViewById(R.id.address);
         String note = getIntent().getStringExtra("note");
         String storeInfo = getIntent().getStringExtra("storeInfo");
-        address = storeInfo.split(",")[1];
+        String address = storeInfo.split(",")[1];
+        addressTextView.setText(address);
 
         Log.d("debug", note);
         Log.d("debug", storeInfo);
@@ -41,21 +43,37 @@ public class OrderDetailActivity extends AppCompatActivity {
         //});
         //thread.start();
 
-        AsyncTask task = new AsyncTask()
+        //AsyncTask task = new AsyncTask()
+        //{
+        //    @Override
+        //    protected Object doInBackground(Object[] params)
+        //    {
+        //        Utils.addressToLatLng(address);
+        //        return null;
+        //    }
+        //
+        //    protected void onPostExecute(Objects o)
+        //    {}
+        //
+        //};
+
+        GeoCodingTask task = new GeoCodingTask();
+        task.execute(address);
+    }
+
+    class  GeoCodingTask extends AsyncTask<String, Void, double[]>
+    {
+        @Override
+        protected double[] doInBackground(String... params)
         {
-            @Override
-            protected Object doInBackground(Object[] params)
-            {
-                Utils.addressToLatLng(address);
-                return null;
-            }
+            String address = params[0];
+            return Utils.addressToLatLng(address);
+        }
 
-            protected void onPostExecute(Objects o)
-            {}
-
-        };
-
-        task.execute();
+        protected void onPostExecute(double[] latLng)
+        {
+            addressTextView.setText(latLng[0] + "," + latLng[1]);
+        }
     }
 
 }
