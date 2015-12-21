@@ -131,11 +131,13 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setClass(this, OrderDetailActivity.class);
         ParseObject object = queryResult.get(position);
+
+        intent.putExtra("storeInfo", object.getString("storeInfo"));
         intent.putExtra("note", object.getString("note"));
         startActivity(intent);
     }
 
-    private void setStoreInfo() {
+    private void  setStoreInfo() {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("StoreInfo");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -144,7 +146,8 @@ public class MainActivity extends AppCompatActivity {
                 String[] stores = new String[objects.size()];
                 for (int i = 0; i < stores.length; i++) {
                     ParseObject object = objects.get(i);
-                    stores[i] = "[" + object.getString("name") + "], " + object.getString("address");
+                    //stores[i] = "[" + object.getString("name") + "], " + object.getString("address");
+                    stores[i] = object.getString("name") + "," + object.getString("address");
                 }
                 ArrayAdapter<String> storeAdapter = new
                         ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, stores);
@@ -171,12 +174,13 @@ public class MainActivity extends AppCompatActivity {
                 for (int i = 0; i < objects.size(); i++) {
                     ParseObject object = objects.get(i); //JSON ojgect package.
                     String note = object.getString("note");
+                    String storeInfo = object.getString("storeInfo");
                     JSONArray array = object.getJSONArray("menu");
 
                     Map<String, String> item = new HashMap<>();
                     item.put("note", note);
                     item.put("drinkNum", "15");
-                    item.put("storeInfo", "NTU Store");
+                    item.put("storeInfo", storeInfo);
 
                     data.add(item);
                 }
@@ -219,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
             ParseObject orderObject = new ParseObject("Order");
             orderObject.put("note", text);
+            orderObject.put("storeInfo", storeInfoSpinner.getSelectedItem());
             orderObject.put("menu", array);
             if (hasPhoto == true)
             {
