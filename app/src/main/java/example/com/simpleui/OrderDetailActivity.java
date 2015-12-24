@@ -64,7 +64,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     class  GeoCodingTask extends AsyncTask<String, Void, double[]>
     {
         @Override
-        protected double[] doInBackground(String... params)
+        protected double[] doInBackground(String... params) //connect network not in main thread.
         {
             String address = params[0];
             return Utils.addressToLatLng(address);
