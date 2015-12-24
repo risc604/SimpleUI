@@ -11,11 +11,4 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".OrderDetailActivity">
 
-     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/address"/>
-
 </RelativeLayout>
