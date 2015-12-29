@@ -80,4 +80,5 @@
         android:id="@+id/progressBar"
         android:layout_below="@+id/storeInfoSpinner"
         android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>

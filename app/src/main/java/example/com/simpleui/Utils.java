@@ -23,7 +23,8 @@ import java.net.URLEncoder;
 /**
  * Created by tomcat on 2015/11/30.
  */
-public class Utils {
+public class Utils
+{
     public static void writeFile(Context context, String fileName, String content)
     {
         try
@@ -142,9 +143,10 @@ public class Utils {
 
     public static String getStaticMapUrl(double[] latLng, int zoom)
     {
-        String cneter = latLng[0] + "," + latLng[1];
+        String center = latLng[0] + "," + latLng[1];
         String url = "https://maps.googleapis.com/maps/api/staticmap?center=" +
-                cneter + "&zoom=" + zoom + "&size=640x400";
+                center + "&zoom=" + zoom + "&size=640x400";
+
         return url;
     }
 

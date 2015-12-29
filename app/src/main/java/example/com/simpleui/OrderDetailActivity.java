@@ -12,13 +12,24 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class OrderDetailActivity extends AppCompatActivity {
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-    private TextView addressTextView;
-    private ImageView staticMapImage;
-    private Switch mapSwitch;
-    private WebView staticMapWebView;
+public class OrderDetailActivity extends AppCompatActivity
+{
+    private TextView    addressTextView;
+    private ImageView   staticMapImage;
+    private Switch      mapSwitch;
+    private WebView     staticMapWeb;
+    private GoogleMap   googleMap;
+    private MapFragment mapFragment;
 
     //private String address;
     @Override
@@ -29,8 +40,8 @@ public class OrderDetailActivity extends AppCompatActivity {
 
         addressTextView = (TextView) findViewById(R.id.address);
         staticMapImage = (ImageView) findViewById(R.id.staticMapImage);
-        staticMapWebView = (WebView) findViewById(R.id.webView);
-        staticMapWebView.setVisibility(View.GONE);  //init
+        staticMapWeb = (WebView) findViewById(R.id.webView);
+        staticMapWeb.setVisibility(View.GONE);  //init
 
         mapSwitch = (Switch) findViewById(R.id.mapSwitch);
         mapSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -39,21 +50,30 @@ public class OrderDetailActivity extends AppCompatActivity {
                 if(isChecked)
                 {
                     staticMapImage.setVisibility(View.GONE);
-                    staticMapWebView.setVisibility(View.VISIBLE);
+                    staticMapWeb.setVisibility(View.VISIBLE);
                 }
                 else
                 {
-                    staticMapWebView.setVisibility(View.GONE);
                     staticMapImage.setVisibility(View.VISIBLE);
+                    staticMapWeb.setVisibility(View.GONE);
                 }
             }
         });
+
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.googleMap);
+        //googleMap = mapFragment.getMap();
+        mapFragment.getMapAsync(new OnMapReadyCallback()
+            {
+                public void onMapReady(GoogleMap map)
+                {
+                    googleMap = map;
+                }
+            });
 
         String note = getIntent().getStringExtra("note");
         String storeInfo = getIntent().getStringExtra("storeInfo");
         String address = storeInfo.split(",")[1];
         addressTextView.setText(address);
-
 
         Log.d("debug", note);
         Log.d("debug", storeInfo);
@@ -96,22 +116,52 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     class  GeoCodingTask extends AsyncTask<String, Void, byte[]>
     {
-        String url;
+        private String url;
+        private double[] latLng;
+
         @Override
         protected byte[] doInBackground(String... params) //connect network not in main thread.
         {
             String address = params[0];
-            double[] latLng = Utils.addressToLatLng(address);
+            //double[] latLng = Utils.addressToLatLng(address);
+            latLng = Utils.addressToLatLng(address);
             url=Utils.getStaticMapUrl(latLng, 18);
             return Utils.urlToByte(url);
         }
 
         protected void onPostExecute(byte[] bytes)
         {
-            staticMapWebView.loadUrl(url);
+            staticMapWeb.loadUrl(url);
             //addressTextView.setText(latLng[0] + "," + latLng[1]);
             Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             staticMapImage.setImageBitmap(bm);
+
+            LatLng storeAddress = new LatLng(latLng[0], latLng[1]);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(storeAddress, 17));
+
+            String[] storeInfo =  getIntent().getStringExtra("storeInfo").split(",") ;
+
+            googleMap.addMarker(new MarkerOptions().
+                            title(storeInfo[0]).
+                            snippet(storeInfo[1]).
+                            position(storeAddress));
+
+            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
+            {
+                @Override
+                public boolean onMarkerClick(Marker marker)
+                {
+                    Toast.makeText(OrderDetailActivity.this,
+                                marker.getTitle(),
+                                Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+
+
+            });
+
+
+           // googleMap.setMyLocationEnabled(true);
         }
     }
 }

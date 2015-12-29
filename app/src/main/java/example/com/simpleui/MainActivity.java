@@ -24,6 +24,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.facebook.login.widget.LoginButton;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView photoImageView;
     private boolean hasPhoto = false;
     private List<ParseObject> queryResult;
+
+    private LoginButton loginButton;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
