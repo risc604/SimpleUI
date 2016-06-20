@@ -4,10 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,8 +26,16 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -43,8 +53,8 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
-    private final static int REQUEST_CODE_MENU_ACTIVITY = 1;
-    private final static int REQUEST_TAKE_PHOTO = 2;
+    private static final int REQUEST_CODE_MENU_ACTIVITY = 1;
+    private static final int REQUEST_TAKE_PHOTO = 2;
 
     private EditText inputText;
     //private Button      btnNext;
@@ -61,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean hasPhoto = false;
     private List<ParseObject> queryResult;
 
+    private CallbackManager callbackManager;
     private LoginButton loginButton;
 
     /**
@@ -72,13 +83,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //ParseObject testObject = new ParseObject("People");
-        //testObject.put("name", "Tom");
-        //testObject.put("age", "23");
-        //testObject.saveInBackground();
-
         setContentView(R.layout.activity_main);
-
         storeInfoSpinner = (Spinner) findViewById(R.id.storeInfoSpinner);
         sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -103,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-        //btnNext.setText("Next");
+
         hideCheckBox = (CheckBox) findViewById(R.id.hideCheckBox);
         hideCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -125,9 +130,45 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         setHistory();
         setStoreInfo();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        //client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        setupFacebook();
+    }
+
+    private void setupFacebook() {
+        callbackManager = CallbackManager.Factory.create();
+        loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                AccessToken token = loginResult.getAccessToken();
+                GraphRequest request = GraphRequest.newGraphPathRequest(token
+                        , "/v2.5/me",
+                        new GraphRequest.Callback() {
+                            @Override
+                            public void onCompleted(GraphResponse response) {
+                                JSONObject object = response.getJSONObject();
+                                try {
+                                    String name = object.getString("name");
+                                    Toast.makeText(MainActivity.this, "Hello " + name, Toast.LENGTH_SHORT).show();
+                                    Log.d("debug", object.toString());
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
     }
 
     private void goToOrderDetail(int position) {
@@ -171,6 +212,12 @@ public class MainActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null) {
+                    Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
                 queryResult = objects;
                 List<Map<String, String>> data = new ArrayList<>();
 
@@ -247,8 +294,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else
                     {
+                        e.printStackTrace();
                         Toast.makeText(MainActivity.this, "[SaveCallback] fail.", Toast.LENGTH_SHORT).show();
                     }
+                    setHistory();
                 }
             });  // the other thread.
             //Log.d("debug", "line: 186");
@@ -260,8 +309,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (hideCheckBox.isChecked()) {
-            text = "*******************";
-            inputText.setText("*******************");
+            text = "**********";
+            inputText.setText("***********");
         }
         //Toast.makeText(this, text, Toast.LENGTH_LONG).show();
         //Toast.makeText(this, Utils.readFile(this, "history.txt"), Toast.LENGTH_LONG).show();
@@ -305,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_take_photo) {
-            //Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "take photo", Toast.LENGTH_SHORT).show();
             goToCamera();
         }
         return super.onOptionsItemSelected(item);

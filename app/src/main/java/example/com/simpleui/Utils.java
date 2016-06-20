@@ -102,7 +102,7 @@ public class Utils
         return null;
     }
 
-    public static byte[] urlToByte(String urlString){
+    public static byte[] urlToBytes(String urlString){
         try
         {
             URL url = new URL(urlString);
@@ -150,11 +150,12 @@ public class Utils
         return url;
     }
 
-    public static double[] getLatLngFormJsonString(String jsonString)
+    public static double[] getLatLngFromJsonString(String jsonString)
     {
         try
         {
             JSONObject object = new JSONObject(jsonString);
+
             JSONObject locationObject = object.getJSONArray("results")
                     .getJSONObject(0)
                     .getJSONObject("geometry")
@@ -175,9 +176,9 @@ public class Utils
     public static double[] addressToLatLng(String address)
     {
         String url = Utils.getGeoCodingUrl(address);
-        byte[] bytes = Utils.urlToByte(url);
+        byte[] bytes = Utils.urlToBytes(url);
         String result = new String(bytes);
-        return Utils.getLatLngFormJsonString(result);
+        return Utils.getLatLngFromJsonString(result);
     }
 }
 

@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+//import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.CompoundButton;
@@ -126,7 +126,7 @@ public class OrderDetailActivity extends AppCompatActivity
             //double[] latLng = Utils.addressToLatLng(address);
             latLng = Utils.addressToLatLng(address);
             url=Utils.getStaticMapUrl(latLng, 18);
-            return Utils.urlToByte(url);
+            return Utils.urlToBytes(url);
         }
 
         protected void onPostExecute(byte[] bytes)
@@ -156,10 +156,7 @@ public class OrderDetailActivity extends AppCompatActivity
                                 Toast.LENGTH_SHORT).show();
                     return false;
                 }
-
-
             });
-
 
            // googleMap.setMyLocationEnabled(true);
         }
